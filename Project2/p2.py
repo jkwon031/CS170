@@ -2,6 +2,8 @@ import os
 import math
 import random
 import copy
+import sys
+
 def normalize(data, num_features):
 	mean = []
 	stand_dev = []
@@ -29,6 +31,15 @@ def normalize(data, num_features):
 		for j in range(1, num_features + 1):
 			data[i][j] = ((data[i][j] - mean[j-1]) / stand_dev[j-1])
 	return data
+
+def nearestNeighbor(current_set_of_features, i, j):
+	distance = 0
+	#print(current_set_of_features)
+	temp = copy.deepcopy(current_set_of_features)
+	for k in range(len(temp)):
+		distance = distance + pow(data[j][temp[k]] - data[i][temp[k]], 2)
+	return distance
+
 def nearestNeighborForward(current_set_of_features, val, i, j):
 	distance = 0
 	#print(current_set_of_features)
@@ -61,6 +72,8 @@ def leave_one_out(data, current_set_of_features, val, flag):
 				elif flag == 1:
 					#print("hi")
 					distance = nearestNeighborBackward(current_set_of_features, val, i, j)
+				elif flag == 2:
+					distance = nearestNeighbor(current_set_of_features, i, j)
 				#print(distance)
 				if distance < best_so_far:
 					best_so_far = distance
@@ -77,7 +90,7 @@ def forward_selection(data, num_features):
 	current_set_of_features = []
 	tempacc = 0
 	for i in range(num_features):
-		print("On the", str(i + 1), "th level of the search tree")
+		print("\nOn the", str(i + 1), "th level of the search tree")
 		feature_to_add_at_this_level = 0
 		best_so_far_accuracy = 0
 		best_so_far_features = []
@@ -104,10 +117,10 @@ def forward_selection(data, num_features):
 					#print("After Removal:", best_set_of_features)
 		current_set_of_features.append(feature_to_add_at_this_level)
 		print("On level", str(i + 1), ", I added feature", str(feature_to_add_at_this_level), "to current set")
-		#print(current_set_of_features)
-		print(best_accuracy, best_set_of_features)		
-		#print(feature_to_add_at_this_level + 1)
-	return(tempacc, current_set_of_features, best_accuracy, best_set_of_features)	
+		print("--Current Set" + str(current_set_of_features))
+		print("--Best accuracy so far: " + str(best_accuracy) + "\n--Best set so far: " + str(best_set_of_features))		
+	print("\nBest Accuracy = " + str(best_accuracy) + ", Best Set of Features = " + str(best_set_of_features))
+	#return(tempacc, current_set_of_features, best_accuracy, best_set_of_features)	
 
 def backward_elimination(data, num_features):
 	flag = 1
@@ -116,9 +129,9 @@ def backward_elimination(data, num_features):
 	current_set_of_features = []
 	for i in range(1, num_features + 1):
 		current_set_of_features.append(i)
-	print("This set:", current_set_of_features)
+	#print("This set:", current_set_of_features)
 	for i in range(len(current_set_of_features)):
-		print("On the", str(i + 1), "th level of the search tree")
+		print("\nOn the", str(i + 1), "th level of the search tree")
 		feature_to_remove_at_this_level = 0
 		best_so_far_accuracy = 0
 		best_so_far_features = []
@@ -148,7 +161,9 @@ def backward_elimination(data, num_features):
 
 		#best_set_of_features = current_set_of_features.copy()
 		print("On level", str(i + 1), ", I removed feature", str(feature_to_remove_at_this_level), "from current set")
-		print(best_accuracy, best_set_of_features)
+		print("--Current Set" + str(current_set_of_features))
+		print("--Best accuracy so far: " + str(best_accuracy) + "\n--Best set so far: " + str(best_set_of_features))		
+	print("\nBest Accuracy = " + str(best_accuracy) + ", Best Set of Features = " + str(best_set_of_features))
 
 def special_algorithm(data, num_features):
 	flag = 0
@@ -156,7 +171,7 @@ def special_algorithm(data, num_features):
 	best_set_of_features = []
 	current_set_of_features = []
 	for i in range(num_features):
-		print("On the", str(i + 1), "th level of the search tree")
+		print("\nOn the", str(i + 1), "th level of the search tree")
 		feature_to_add_at_this_level = 0
 		best_so_far_accuracy = 0
 		best_so_far_features = []
@@ -182,12 +197,15 @@ def special_algorithm(data, num_features):
 					best_set_of_features.append(k + 1)
 					#print("After Removal:", best_set_of_features)
 		if temp == best_accuracy:
+			#print(best_accuracy, best_set_of_features)
+			print("--Current Set" + str(current_set_of_features))
+			print("--Best accuracy so far: " + str(best_accuracy) + "\n--Best set so far: " + str(best_set_of_features))		
 			break
 		current_set_of_features.append(feature_to_add_at_this_level)
 		print("On level", str(i + 1), ", I added feature", str(feature_to_add_at_this_level), "to current set")
-		#print(current_set_of_features)
-		print(best_accuracy, best_set_of_features)		
-		#print(feature_to_add_at_this_level + 1)
+		print("--Current Set" + str(current_set_of_features))
+		print("--Best accuracy so far: " + str(best_accuracy) + "\n--Best set so far: " + str(best_set_of_features))		
+	print("\nBest Accuracy = " + str(best_accuracy) + ", Best Set of Features = " + str(best_set_of_features))
 
 
 
@@ -197,6 +215,7 @@ if __name__ == "__main__":
 	#norm_data = []
 	#features = []
 	num_features = 0
+	tot_features = []
 	num_instances = 0
 	acc = 0
 	#mean = []
@@ -211,6 +230,8 @@ if __name__ == "__main__":
 
 	except:
 		print("The file " + filename + " doesn't exist")
+		sys.exit(1)
+
 
 
 	algorithm = input("Type the number of algorithm you want to run:\n" +
@@ -246,13 +267,19 @@ if __name__ == "__main__":
 	#print(data)
 	print("This dataset has", num_features, "features with", num_instances, "instances")
 
+	print("Normalizing data...")
 	data = normalize(data, num_features)
 	
-	#acc = leave_one_out(data, num_instances, num_features)
-	#print("Running nearest neighbor with all", num_features, "features, using \"leaving-one-out\" evaluation, I get an accuracy of", acc)
+	print("Done")
+
+	for i in range(1, num_features + 1):
+		tot_features.append(i)
+
+	acc = leave_one_out(data, tot_features, 0, 2)
+	print("Running nearest neighbor with all", num_features, "features, using \"leaving-one-out\" evaluation, I get an accuracy of", acc)
 
 	if algorithm == "1":
-		tot = forward_selection(data, num_features)
+		forward_selection(data, num_features)
 	elif algorithm == "2":
 		backward_elimination(data, num_features)
 	elif algorithm == "3":
@@ -261,13 +288,3 @@ if __name__ == "__main__":
 		print("Invalid Option")
 
 #print("Running nearest neighbor with all", num_features, "features, using \"leaving-one-out\" evaluation, I get an accuracy of", tot[0])	
-
-	#forward_selection(data, num_features)
-	#backward_elimination(data, num_features)
-'''
-	for i in range(1, num_features + 1):
-		features = []
-		for row in data:
-			features.append(row[i])
-			print(features)
-'''
