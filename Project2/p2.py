@@ -68,8 +68,6 @@ def forward_selection(data, num_features):
 def backward_elimination(data, num_features):
 	flag = 1
 	best_accuracy = 0
-	#best_feature = 0
-	#best_so_far_features = []
 	best_set_of_features = []
 	current_set_of_features = []
 	for i in range(1, num_features + 1):
@@ -90,19 +88,22 @@ def backward_elimination(data, num_features):
 				print("accuracy: " + str(accuracy))
 				if accuracy > best_so_far_accuracy:
 					best_so_far_accuracy = accuracy
-					best_so_far_features = current_set_of_features
+					best_so_far_features = current_set_of_features.copy()
 					#print(best_so_far_features)
 					feature_to_remove_at_this_level = k + 1
 				if best_so_far_accuracy > best_accuracy:
-					best_set_of_features = best_so_far_features
+					#print("TESTING:", best_so_far_accuracy, best_accuracy)
+					#print("TESTING FEATURES:", best_so_far_features, best_set_of_features)
 					best_accuracy = best_so_far_accuracy
-					print("Best so far:", best_so_far_accuracy)
-					#print(best_set_of_features)
-					#print(best_set_of_features)
-		#best_set_of_features.append(best_feature)
+					best_set_of_features = best_so_far_features
+					#print("Before Removal:", best_set_of_features)
+					#print(k + 1)
+					best_set_of_features.remove(k + 1)
+					#print("After Removal:", best_set_of_features)
 		current_set_of_features.remove(feature_to_remove_at_this_level)
+
+		#best_set_of_features = current_set_of_features.copy()
 		print("On level", str(i + 1), ", I removed feature", str(feature_to_remove_at_this_level), "from current set")
-		print(current_set_of_features)
 		print(best_accuracy, best_set_of_features)
 
 
